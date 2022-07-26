@@ -18,13 +18,13 @@ public class companyOwner {
     private String name;
 
     @Column(name = "roleName")
-    static String roleName = "companyOwner";
+    public final static String roleName = "companyOwner";
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "admin_id")
     admin Admin;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "employees_Of_The_Company",
     joinColumns = @JoinColumn(name = "companyOwner_id"),
     inverseJoinColumns = @JoinColumn(name = "Employee_id"))

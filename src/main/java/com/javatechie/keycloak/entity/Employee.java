@@ -24,7 +24,7 @@ public class Employee {
     private List<companyOwner> CompaniesOfTheEmployee;
 
     @Column(name = "roleName")
-    static String roleName = "employee";
+    public final static String roleName = "employee";
 
     public Employee(String name, double salary) {
         this.name = name;

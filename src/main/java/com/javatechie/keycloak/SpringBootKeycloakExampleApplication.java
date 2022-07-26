@@ -1,12 +1,15 @@
 package com.javatechie.keycloak;
 
 import com.javatechie.keycloak.entity.Employee;
+import com.javatechie.keycloak.entity.admin;
+import com.javatechie.keycloak.entity.companyOwner;
 import com.javatechie.keycloak.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,12 +28,22 @@ public class SpringBootKeycloakExampleApplication {
 
     //this method can be accessed by user whose role is user
     @GetMapping("/{employeeId}")
-    @RolesAllowed("employee")
-    public ResponseEntity<Employee> getEmployee(@PathVariable int employeeId) throws AccessDeniedException {
+    @PreAuthorize("hasRole('" + Employee.roleName + "')")
+    public ResponseEntity<Employee> getEmployeebyEmployee(@PathVariable int employeeId) throws AccessDeniedException {
         if(service.getEmployee(employeeId)!=null) return ResponseEntity.ok(service.getEmployee(employeeId));
-        else throw new AccessDeniedException("Access denied");
+        else throw new AccessDeniedException("Access denied");}
 
-    }
+    @GetMapping("/{employeeId}")
+    @PreAuthorize("hasRole('" + companyOwner.roleName + "')")
+    public ResponseEntity<Employee> getEmployeebyCompanyOwner(@PathVariable int employeeId) throws AccessDeniedException {
+        if(service.getEmployee(employeeId)!=null) return ResponseEntity.ok(service.getEmployee(employeeId));
+        else throw new AccessDeniedException("Access denied");}
+
+    @GetMapping("/{employeeId}")
+    @PreAuthorize("hasRole('" + admin.roleName + "')")
+    public ResponseEntity<Employee> getEmployeebyAdmin(@PathVariable int employeeId) throws AccessDeniedException {
+       return ResponseEntity.ok(service.getEmployee(employeeId));}
+
 
     //this method can be accessed by user whose role is admin
     @GetMapping

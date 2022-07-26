@@ -18,7 +18,7 @@ public class admin{
     private String name;
 
     @Column(name = "roleName")
-    static String roleName = "admin";
+    public final static String roleName = "admin";
 
     @OneToMany(mappedBy = "Admin")
     private List<companyOwner> companyOwnersManagedByTheAdmin;
