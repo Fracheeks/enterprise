@@ -1,21 +1,17 @@
 package com.javatechie.keycloak.entity;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.*;
 
 @Entity
-@NoArgsConstructor
-@Data
 public class admin{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.AUTO )
+    private final int id=0;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "Istance")
+    private static admin Istance = null;
 
     @Column(name = "roleName")
     public final static String roleName = "admin";
@@ -23,10 +19,17 @@ public class admin{
     @OneToMany(mappedBy = "Admin")
     private List<companyOwner> companyOwnersManagedByTheAdmin;
 
-    public admin(String name){
-        this.name=name;
+    public void addOwner(companyOwner owner) {
+        companyOwnersManagedByTheAdmin.add(owner);}
+
+    public admin(){
+      companyOwnersManagedByTheAdmin = new ArrayList<>();
+    };
+
+    public admin getIstance(){
+        if(Istance==null) Istance= new admin();
+        return Istance;
+
     }
 
-    public admin(String name,companyOwner owner) {
-        this.name=name;}
 }

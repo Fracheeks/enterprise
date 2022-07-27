@@ -14,6 +14,8 @@ public class companyOwner {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
+    private String username;
+
     @Column(name = "name")
     private String name;
 
@@ -22,7 +24,7 @@ public class companyOwner {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "admin_id")
-    admin Admin;
+    admin Admin = new admin();
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "employees_Of_The_Company",
@@ -30,7 +32,8 @@ public class companyOwner {
     inverseJoinColumns = @JoinColumn(name = "Employee_id"))
     private List<Employee> employeesOfTheCompany;
 
-    public companyOwner(String name){
+    public companyOwner(String name, String username){
         this.name = name;
+        Admin.addOwner(this);
     }
 }

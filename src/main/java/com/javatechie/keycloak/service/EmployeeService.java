@@ -32,8 +32,16 @@ public class EmployeeService {
                 .orElse(null);
     }
 
+    public void  deleteEmployee(Long employeeId) {
+        employeeRepository.deleteById(Math.toIntExact(employeeId));
+    }
+
     public List<Employee> getAllEmployees() {
         return employeeRepository
                 .findAll();
+    }
+    public Employee addEmployee(Employee newEmployee){
+        int id = employeeRepository.save(newEmployee).getId();
+        return getEmployee(id);
     }
 }
