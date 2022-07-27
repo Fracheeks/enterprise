@@ -26,7 +26,7 @@ public class SpringBootKeycloakExampleApplication {
 
     //GET REQUEST
     @GetMapping("/{employeeId}")
-    @PostAuthorize ("returnObject.username == authentication.principal.username"+ "|| hasRole('" + admin.roleName + "')"+"hasRole('" + companyOwner.roleName + "')")
+    @PreAuthorize ("returnObject.username == authentication.principal.username"+ "|| hasRole('" + admin.roleName + "')" + "|| hasRole('" + companyOwner.roleName + "')")
     public ResponseEntity<Employee> getEmployeebyEmployee(@PathVariable int employeeId) throws AccessDeniedException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(principal instanceof companyOwner){
@@ -44,13 +44,13 @@ public class SpringBootKeycloakExampleApplication {
             return ResponseEntity.ok(service.getEmployee(employeeId));
         else throw new AccessDeniedException("Access denied");}
 
-    //this method can be accessed by user whose role is admin
+    //this method can be accessed by user whose role is admin*/
 
     @GetMapping
-    @PostAuthorize("returnObject.username == authentication.principal.username" + "|| hasRole('" + admin.roleName + "')")
-    public companyOwner loadCompanyOwnerDetail(String username) {
-        return service2.getCompanyOwnerByUsername(username);
-    }*/
+    @PostAuthorize("hasRole('" + admin.roleName + "')")
+    public  ResponseEntity<List<Employee>> loadAllEmployees () {
+        return ResponseEntity.ok(service.getAllEmployees());
+    }
 
    /* @PostAuthorize("returnObject.username == authentication.principal.nickName")
     public admin loadAdminDetail(String username) {
@@ -76,7 +76,7 @@ public class SpringBootKeycloakExampleApplication {
 
     //POST REQUEST
     @PostMapping
-    @PostAuthorize("hasRole('" + companyOwner.roleName + "')" + "|| hasRole('" + admin.roleName + "')")
+    @PreAuthorize("hasRole('" + companyOwner.roleName + "')" + "|| hasRole('" + admin.roleName + "')")
     Employee newEmployee(@RequestBody Employee newEmployee) {
         return service.addEmployee(newEmployee);
     }
