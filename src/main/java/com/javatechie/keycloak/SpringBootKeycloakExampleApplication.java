@@ -22,7 +22,7 @@ public class SpringBootKeycloakExampleApplication {
 
     //GET REQUEST
     @GetMapping("/{employeeId}")
-    public ResponseEntity<user> getEmployeebyEmployee(@PathVariable int employeeId) throws AccessDeniedException {
+    public ResponseEntity<user> getEmployeebyEmployee(@PathVariable Long employeeId) throws AccessDeniedException {
         user principal = (user) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         //companyOwner access
@@ -53,7 +53,7 @@ public class SpringBootKeycloakExampleApplication {
         user principal = (user)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(principal instanceof companyOwner){
           if(((companyOwner)principal).getEmployeesOfTheCompany().
-                  contains(service.getEmployee(Math.toIntExact(id)))){
+                  contains(service.getEmployee(id))){
                           service.deleteEmployee(id);}}
         else{service.deleteEmployee(id);}
 

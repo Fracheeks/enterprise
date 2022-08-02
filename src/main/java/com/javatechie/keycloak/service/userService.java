@@ -39,9 +39,9 @@ public class userService {
         return repo.findAll().stream().filter(e->e.roleName.equals("companyOwner")).toList();
     }
 
-    public user getEmployee(int employeeId) {
+    public user getEmployee(Long employeeId) {
         return repo
-                .findById(employeeId)
+                .findById(Math.toIntExact(employeeId))
                 .orElse(null);
     }
 
@@ -53,7 +53,7 @@ public class userService {
         return repo.findAll().stream().filter(e->e.roleName.equals("employee")).toList();
     }
     public user addEmployee(Employee newEmployee){
-        int id = repo.save(newEmployee).getId();
+        Long id = repo.save(newEmployee).getId();
         return getEmployee(id);
     }
 

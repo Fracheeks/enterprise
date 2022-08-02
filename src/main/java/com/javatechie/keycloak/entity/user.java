@@ -6,15 +6,13 @@ import javax.persistence.*;
 
 @MappedSuperclass
 public abstract class user {
+    @lombok.Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore
-    private int id;
+    private Long id;
 
     @Column(name = "roleName")
     public String roleName;
 
-    public int getId(){
-        return id;
-    }
 }
