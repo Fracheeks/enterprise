@@ -22,23 +22,23 @@ public class SpringBootKeycloakExampleApplication {
 
     //GET REQUEST
     @GetMapping("/{employeeId}")
-    public ResponseEntity<user> getEmployeebyEmployee(@PathVariable Long employeeId) throws AccessDeniedException {
+    public ResponseEntity<user> getEmployeebyEmployee(@PathVariable Long Id) throws AccessDeniedException {
         user principal = (user) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         //companyOwner access
         if(principal instanceof companyOwner){
-            if(((companyOwner)principal).getEmployeesOfTheCompany().contains(service.getEmployee(employeeId))) return ResponseEntity.ok(service.getEmployee(employeeId));
+            if(((companyOwner)principal).getEmployeesOfTheCompany().contains(service.getUser(Id))) return ResponseEntity.ok(service.getUser(Id));
             else throw new AccessDeniedException("Access denied");
         }
 
         //employee access
         if(principal instanceof Employee){
-            if(((Employee)principal).getId()==employeeId) return ResponseEntity.ok(service.getEmployee(employeeId));
+            if(((Employee)principal).getId()== Id) return ResponseEntity.ok(service.getUser(Id));
             else throw new AccessDeniedException("Access denied");
         }
 
         //admin access
-        return ResponseEntity.ok(service.getEmployee(employeeId));}
+        return ResponseEntity.ok(service.getUser(Id));}
 
     @GetMapping
     @PostAuthorize("hasRole('admin')")
@@ -53,9 +53,9 @@ public class SpringBootKeycloakExampleApplication {
         user principal = (user)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(principal instanceof companyOwner){
           if(((companyOwner)principal).getEmployeesOfTheCompany().
-                  contains(service.getEmployee(id))){
-                          service.deleteEmployee(id);}}
-        else{service.deleteEmployee(id);}
+                  contains(service.getUser(id))){
+                          service.deleteUser(id);}}
+        else{service.deleteUser(id);}
 
         return ResponseEntity.noContent().build();}
 

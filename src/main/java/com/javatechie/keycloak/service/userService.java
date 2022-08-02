@@ -29,23 +29,17 @@ public class userService {
                 ).collect(Collectors.toList()));
     }
 
-    public user getUserbyId(int id) {
-        return repo
-                .findById(id)
-                .orElse(null);
-    }
-
     public List<user> getAllCompanyOwner() {
         return repo.findAll().stream().filter(e->e.roleName.equals("companyOwner")).toList();
     }
 
-    public user getEmployee(Long employeeId) {
+    public user getUser(Long id) {
         return repo
-                .findById(Math.toIntExact(employeeId))
+                .findById(Math.toIntExact(id))
                 .orElse(null);
     }
 
-    public void  deleteEmployee(Long employeeId) {
+    public void  deleteUser(Long employeeId) {
         repo.deleteById(Math.toIntExact(employeeId));
     }
 
@@ -54,7 +48,7 @@ public class userService {
     }
     public user addEmployee(Employee newEmployee){
         Long id = repo.save(newEmployee).getId();
-        return getEmployee(id);
+        return getUser(id);
     }
 
 
