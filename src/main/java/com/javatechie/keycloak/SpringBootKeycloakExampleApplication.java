@@ -22,13 +22,22 @@ public class SpringBootKeycloakExampleApplication {
 
     //GET REQUEST
     @GetMapping("/{employeeId}")
-    @PreAuthorize ("returnObject.username == authentication.principal.username"+ "|| hasRole('admin')" + "|| hasRole('" + companyOwner.roleName + "')")
     public ResponseEntity<user> getEmployeebyEmployee(@PathVariable int employeeId) throws AccessDeniedException {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        user principal = (user) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        //companyOwner access
         if(principal instanceof companyOwner){
             if(((companyOwner)principal).getEmployeesOfTheCompany().contains(service.getEmployee(employeeId))) return ResponseEntity.ok(service.getEmployee(employeeId));
             else throw new AccessDeniedException("Access denied");
         }
+
+        //employee access
+        if(principal instanceof Employee){
+            if(((Employee)principal).getId()==employeeId) return ResponseEntity.ok(service.getEmployee(employeeId));
+            else throw new AccessDeniedException("Access denied");
+        }
+
+        //admin access
         return ResponseEntity.ok(service.getEmployee(employeeId));}
 
     @GetMapping
@@ -39,23 +48,31 @@ public class SpringBootKeycloakExampleApplication {
 
     //DELETE REQUEST
     @DeleteMapping("/{employeeId}")
-    @PreAuthorize("hasRole('" + companyOwner.roleName + "')"+"|| hasRole('admin')")
+    @PreAuthorize("hasRole('companyOwner')"+"|| hasRole('admin')")
     ResponseEntity<?> deleteEmployeeByCompanyOwner(@PathVariable Long id) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        user principal = (user)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(principal instanceof companyOwner){
-          if(((companyOwner)principal).getEmployeesOfTheCompany().contains(service.getEmployee(Math.toIntExact(id))))service.deleteEmployee(id);}
+          if(((companyOwner)principal).getEmployeesOfTheCompany().
+                  contains(service.getEmployee(Math.toIntExact(id)))){
+                          service.deleteEmployee(id);}}
         else{service.deleteEmployee(id);}
 
-         return ResponseEntity.noContent().build();}
+        return ResponseEntity.noContent().build();}
 
     //POST REQUEST
     @PostMapping
-    @PreAuthorize("hasRole('" + companyOwner.roleName + "')" + "|| hasRole('admin')")
+    @PreAuthorize("hasRole('companyOwner')" + "|| hasRole('admin')")
     user newEmployee(@RequestBody Employee newEmployee) {
+        user principal = (user)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        //adding the relationship "employee-companyOwner"
+        if(principal instanceof companyOwner){
+            ((companyOwner)principal).addNewEmployee(newEmployee);
+            newEmployee.setCompanyOwner((companyOwner) principal);
+        }
+
         return service.addEmployee(newEmployee);
     }
-
-
 
     public static void main(String[] args) {
         SpringApplication.run(SpringBootKeycloakExampleApplication.class, args);

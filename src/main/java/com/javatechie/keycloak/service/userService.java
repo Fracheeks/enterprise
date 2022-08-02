@@ -29,14 +29,14 @@ public class userService {
                 ).collect(Collectors.toList()));
     }
 
-    public user getCompanyOwnerbyId(int employeeId) {
+    public user getUserbyId(int id) {
         return repo
-                .findById(employeeId)
+                .findById(id)
                 .orElse(null);
     }
 
     public List<user> getAllCompanyOwner() {
-        return repo.findAll();
+        return repo.findAll().stream().filter(e->e.roleName.equals("companyOwner")).toList();
     }
 
     public user getEmployee(int employeeId) {
@@ -50,13 +50,13 @@ public class userService {
     }
 
     public List<user> getAllEmployees() {
-        return repo
-                .findAll();
+        return repo.findAll().stream().filter(e->e.roleName.equals("employee")).toList();
     }
     public user addEmployee(Employee newEmployee){
         int id = repo.save(newEmployee).getId();
         return getEmployee(id);
     }
+
 
 
 }

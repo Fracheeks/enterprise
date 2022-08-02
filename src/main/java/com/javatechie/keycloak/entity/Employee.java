@@ -5,14 +5,11 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@Entity(name = "Employee")
+@Entity
+@Table(name = "Employee_user")
 @NoArgsConstructor
 @Data
 public class Employee extends user {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
 
     @Column(name = "name")
     private String name;
@@ -24,17 +21,17 @@ public class Employee extends user {
     @JoinColumn(name = "companyOwner_id")
     private companyOwner CompanyOwner;
 
-    @Column(name = "roleName")
-    public final static String roleName = "employee";
-
     public Employee(String name, double salary) {
         this.name = name;
         this.salary = salary;
+        super.roleName="employee";
     }
 
     public Employee(String name, double salary, companyOwner owner) {
         this.name = name;
         this.salary = salary;
         this.CompanyOwner=owner;
+        super.roleName="employee";
     }
+
 }
