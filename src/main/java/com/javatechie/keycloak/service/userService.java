@@ -39,8 +39,8 @@ public class userService {
                 .orElse(null);
     }
 
-    public void  deleteUser(int Id) {
-        repo.deleteById(Id);
+    public void  deleteUser(Long Id) {
+        repo.deleteById(Math.toIntExact(Id));
     }
 
     public List<user> getAllEmployees() {

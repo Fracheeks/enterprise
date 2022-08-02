@@ -16,6 +16,8 @@ public class companyOwner extends user {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "company")
+    private String company;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "CompanyOwner")
     private List<Employee> employeesOfTheCompany;

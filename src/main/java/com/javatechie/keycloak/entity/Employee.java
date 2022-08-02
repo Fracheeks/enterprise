@@ -19,7 +19,7 @@ public class Employee extends user {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "companyOwner_id")
-    private companyOwner CompanyOwner;
+    private companyOwner CompanyOwner=null;
 
     public Employee(String name, double salary) {
         this.name = name;
@@ -34,4 +34,7 @@ public class Employee extends user {
         super.roleName="employee";
     }
 
+    public companyOwner getCompanyOwner() {
+        return CompanyOwner;
+    }
 }

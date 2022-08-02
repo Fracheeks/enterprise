@@ -21,13 +21,15 @@ public class SpringBootKeycloakExampleApplication {
     private userService service;
 
     //GET REQUEST
-    @GetMapping("/{employeeId}")
+    @GetMapping("/{Id}")
     public ResponseEntity<user> getEmployeebyEmployee(@PathVariable Long Id) throws AccessDeniedException {
         user principal = (user) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         //companyOwner access
         if(principal instanceof companyOwner){
-            if(((companyOwner)principal).getEmployeesOfTheCompany().contains(service.getUser(Id))) return ResponseEntity.ok(service.getUser(Id));
+            if(((companyOwner)principal).getEmployeesOfTheCompany().
+                    contains(service.getUser(Id)) || ((companyOwner)principal).getId() == Id){
+                          return ResponseEntity.ok(service.getUser(Id));}
             else throw new AccessDeniedException("Access denied");
         }
 
@@ -40,22 +42,38 @@ public class SpringBootKeycloakExampleApplication {
         //admin access
         return ResponseEntity.ok(service.getUser(Id));}
 
+    //get all users
     @GetMapping
     @PostAuthorize("hasRole('admin')")
-    public  ResponseEntity<List<user>> loadAllEmployees () {
+    public  ResponseEntity<List<user>> loadAllUsers () {
         return ResponseEntity.ok(service.getAllEmployees());
+    }
+
+    //get all employees of a company
+    @GetMapping("/company/{companyName}")
+    @PostAuthorize("hasRole('admin')")
+    public  ResponseEntity<List<user>> loadAllEmployees (@PathVariable String companyName) {
+        return ResponseEntity.ok(service.getAllEmployees().stream().
+                filter(e->((Employee)e).getCompanyOwner().getCompany().equals(companyName)).toList());
+    }
+
+    //get all companies
+    @GetMapping("/company")
+    @PostAuthorize("hasRole('admin')")
+    public  ResponseEntity<List<String>> loadAllEmployees () {
+        return ResponseEntity.ok(service.getAllCompanyOwner().stream().map(e->((companyOwner)e).getCompany()).toList());
     }
 
     //DELETE REQUEST
     @DeleteMapping("/{employeeId}")
     @PreAuthorize("hasRole('companyOwner')"+"|| hasRole('admin')")
-    ResponseEntity<?> deleteEmployeeByCompanyOwner(@PathVariable Long id) {
+    ResponseEntity<?> deleteEmployeeByCompanyOwner(@PathVariable Long employeeId) {
         user principal = (user)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(principal instanceof companyOwner){
           if(((companyOwner)principal).getEmployeesOfTheCompany().
-                  contains(service.getUser(id))){
-                          service.deleteUser(id);}}
-        else{service.deleteUser(id);}
+                  contains(service.getUser(employeeId))){
+                          service.deleteUser(employeeId);}}
+        else{service.deleteUser(employeeId);}
 
         return ResponseEntity.noContent().build();}
 
