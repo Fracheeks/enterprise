@@ -1,4 +1,4 @@
-package com.javatechie.keycloak.entity;
+/*package com.javatechie.keycloak.entity;
 
 import javax.persistence.*;
 import java.util.*;
@@ -32,4 +32,4 @@ public class admin{
 
     }
 
-}
+}*/

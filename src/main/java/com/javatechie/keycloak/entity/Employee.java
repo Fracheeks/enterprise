@@ -4,12 +4,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity(name = "Employee")
 @NoArgsConstructor
 @Data
-public class Employee {
+public class Employee extends user {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
@@ -20,8 +20,9 @@ public class Employee {
     @Column(name = "salary")
     private double salary;
 
-    @ManyToMany(mappedBy = "employeesOfTheCompany")
-    private List<companyOwner> CompaniesOfTheEmployee;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "companyOwner_id")
+    private companyOwner CompanyOwner;
 
     @Column(name = "roleName")
     public final static String roleName = "employee";
@@ -34,6 +35,6 @@ public class Employee {
     public Employee(String name, double salary, companyOwner owner) {
         this.name = name;
         this.salary = salary;
-        this.getCompaniesOfTheEmployee().add(owner);
+        this.CompanyOwner=owner;
     }
 }

@@ -1,7 +1,6 @@
-package com.javatechie.keycloak.service;
+/*package com.javatechie.keycloak.service;
 
 import com.javatechie.keycloak.entity.Employee;
-import com.javatechie.keycloak.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,4 +43,4 @@ public class EmployeeService {
         int id = employeeRepository.save(newEmployee).getId();
         return getEmployee(id);
     }
-}
+}*/

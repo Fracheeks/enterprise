@@ -1,4 +1,4 @@
-package com.javatechie.keycloak.service;
+/*package com.javatechie.keycloak.service;
 
 import com.javatechie.keycloak.entity.companyOwner;
 import com.javatechie.keycloak.repository.companyOwnerRepository;
@@ -38,4 +38,4 @@ public class companyOwnerService {
     public List<companyOwner> getAllCompanyOwner() {
         return CompanyOwnerRepository.findAll();
     }
-}
+}*/

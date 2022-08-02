@@ -18,13 +18,12 @@ import java.util.List;
 public class SpringBootKeycloakExampleApplication {
 
     @Autowired
-    private EmployeeService service;
-    private companyOwnerService service2;
+    private userService service;
 
     //GET REQUEST
     @GetMapping("/{employeeId}")
-    @PreAuthorize ("returnObject.username == authentication.principal.username"+ "|| hasRole('" + admin.roleName + "')" + "|| hasRole('" + companyOwner.roleName + "')")
-    public ResponseEntity<Employee> getEmployeebyEmployee(@PathVariable int employeeId) throws AccessDeniedException {
+    @PreAuthorize ("returnObject.username == authentication.principal.username"+ "|| hasRole('admin')" + "|| hasRole('" + companyOwner.roleName + "')")
+    public ResponseEntity<user> getEmployeebyEmployee(@PathVariable int employeeId) throws AccessDeniedException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(principal instanceof companyOwner){
             if(((companyOwner)principal).getEmployeesOfTheCompany().contains(service.getEmployee(employeeId))) return ResponseEntity.ok(service.getEmployee(employeeId));
@@ -32,31 +31,15 @@ public class SpringBootKeycloakExampleApplication {
         }
         return ResponseEntity.ok(service.getEmployee(employeeId));}
 
-  /*  @GetMapping("/{employeeId}")
-    @PreAuthorize("hasRole('" + companyOwner.roleName + "')")
-    public ResponseEntity<Employee> getEmployeebyCompanyOwner(@PathVariable int employeeId) throws AccessDeniedException {
-        companyOwner principal = (companyOwner) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        if(principal.getEmployeesOfTheCompany().contains(service.getEmployee(employeeId)))
-            return ResponseEntity.ok(service.getEmployee(employeeId));
-        else throw new AccessDeniedException("Access denied");}
-
-    //this method can be accessed by user whose role is admin*/
-
     @GetMapping
-    @PostAuthorize("hasRole('" + admin.roleName + "')")
-    public  ResponseEntity<List<Employee>> loadAllEmployees () {
+    @PostAuthorize("hasRole('admin')")
+    public  ResponseEntity<List<user>> loadAllEmployees () {
         return ResponseEntity.ok(service.getAllEmployees());
     }
 
-   /* @PostAuthorize("returnObject.username == authentication.principal.nickName")
-    public admin loadAdminDetail(String username) {
-        return service3.getAdminbyUsername(username);
-    }*/
-
     //DELETE REQUEST
     @DeleteMapping("/{employeeId}")
-    @PreAuthorize("hasRole('" + companyOwner.roleName + "')"+"|| hasRole('" + admin.roleName + "')")
+    @PreAuthorize("hasRole('" + companyOwner.roleName + "')"+"|| hasRole('admin')")
     ResponseEntity<?> deleteEmployeeByCompanyOwner(@PathVariable Long id) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(principal instanceof companyOwner){
@@ -65,16 +48,10 @@ public class SpringBootKeycloakExampleApplication {
 
          return ResponseEntity.noContent().build();}
 
-    /*@DeleteMapping("/{employeeId}")
-    @PreAuthorize("hasRole('" + admin.roleName + "')")
-    ResponseEntity<?> deleteEmployeeByAdmin(@PathVariable Long id) {
-        service.deleteEmployee(id);
-        return ResponseEntity.noContent().build();}*/
-
     //POST REQUEST
     @PostMapping
-    @PreAuthorize("hasRole('" + companyOwner.roleName + "')" + "|| hasRole('" + admin.roleName + "')")
-    Employee newEmployee(@RequestBody Employee newEmployee) {
+    @PreAuthorize("hasRole('" + companyOwner.roleName + "')" + "|| hasRole('admin')")
+    user newEmployee(@RequestBody Employee newEmployee) {
         return service.addEmployee(newEmployee);
     }
 
