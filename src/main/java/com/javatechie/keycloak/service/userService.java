@@ -17,37 +17,25 @@ public class userService {
     @Autowired
     private userRepository repo;
 
-    @PostConstruct
-    public void initializeTable() {
-        repo.saveAll(
-                Stream.of(
-                        new companyOwner("fred"),
-                        new companyOwner("steve"),
-                        new Employee("john", 20000),
-                        new Employee("mak", 55000),
-                        new Employee("peter", 120000)
-                ).collect(Collectors.toList()));
-    }
-
     public List<user> getAllCompanyOwner() {
         return repo.findAll().stream().filter(e->e.roleName.equals("companyOwner")).toList();
     }
 
-    public user getUser(Long id) {
+    public user getUser(int id) {
         return repo
-                .findById(Math.toIntExact(id))
+                .findById(id)
                 .orElse(null);
     }
 
-    public void  deleteUser(Long Id) {
-        repo.deleteById(Math.toIntExact(Id));
+    public void  deleteUser(int Id) {
+        repo.deleteById(Id);
     }
 
     public List<user> getAllEmployees() {
         return repo.findAll().stream().filter(e->e.roleName.equals("employee")).toList();
     }
     public user addEmployee(Employee newEmployee){
-        Long id = repo.save(newEmployee).getId();
+        int id = repo.save(newEmployee).getId();
         return getUser(id);
     }
 

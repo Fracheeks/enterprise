@@ -19,11 +19,12 @@ public class companyOwner extends user {
     @Column(name = "company")
     private String company;
 
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "CompanyOwner")
+    @OneToMany(fetch = FetchType.EAGER,mappedBy = "CompanyOwner")
     private List<Employee> employeesOfTheCompany;
 
-    public companyOwner(String name){
+    public companyOwner(String name, String company){
         this.name = name;
+        this.company=company;
         super.roleName="companyOwner";
     }
 

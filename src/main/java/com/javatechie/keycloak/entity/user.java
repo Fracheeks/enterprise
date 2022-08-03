@@ -1,18 +1,19 @@
 package com.javatechie.keycloak.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
 
 import javax.persistence.*;
 
-@MappedSuperclass
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+@Data
 public abstract class user {
-    @lombok.Getter
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore
-    private Long id;
+    private int id;
 
     @Column(name = "roleName")
     public String roleName;
-
 }

@@ -17,7 +17,7 @@ public class Employee extends user {
     @Column(name = "salary")
     private double salary;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "companyOwner_id")
     private companyOwner CompanyOwner=null;
 

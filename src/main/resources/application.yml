@@ -1,3 +1,4 @@
+
 server:
   port: 9090
 
@@ -5,10 +6,16 @@ spring:
   h2:
     console:
       enabled: true
+  jpa:
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
+
 
 keycloak:
-  realm: javatechie
+  realm: service
   auth-server-url: http://localhost:8081/auth
   resource: springboot-keycloak
   public-client: true
   bearer-only: true
+
