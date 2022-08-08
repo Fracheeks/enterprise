@@ -14,4 +14,7 @@ public abstract class user {
 
     @Column(name = "roleName")
     public String roleName;
+
+    @Column(name = "username")
+    public String username;
 }

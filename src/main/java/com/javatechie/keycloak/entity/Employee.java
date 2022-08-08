@@ -11,9 +11,6 @@ import javax.persistence.*;
 @Data
 public class Employee extends user {
 
-    @Column(name = "name")
-    private String name;
-
     @Column(name = "salary")
     private double salary;
 
@@ -21,14 +18,14 @@ public class Employee extends user {
     @JoinColumn(name = "companyOwner_id")
     private companyOwner CompanyOwner=null;
 
-    public Employee(String name, double salary) {
-        this.name = name;
+    public Employee(String username, double salary) {
+        super.username = username;
         this.salary = salary;
         super.roleName="employee";
     }
 
-    public Employee(String name, double salary, companyOwner owner) {
-        this.name = name;
+    public Employee(String username, double salary, companyOwner owner) {
+        this.username = username;
         this.salary = salary;
         this.CompanyOwner=owner;
         super.roleName="employee";

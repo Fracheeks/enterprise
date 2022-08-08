@@ -15,6 +15,8 @@ import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
+import java.security.Principal;
+
 @KeycloakConfiguration
 @EnableGlobalMethodSecurity(jsr250Enabled = true, prePostEnabled = true)
 @Import(KeycloakSpringBootConfigResolver.class)

@@ -5,11 +5,7 @@ import com.javatechie.keycloak.repository.userRepository;
 import com.javatechie.keycloak.entity.user;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class userService {
@@ -43,4 +39,7 @@ public class userService {
         return repo.findAll();
     }
 
+    public user getUserByUsername(String username) {
+        return getAllEmployees().stream().filter(e->e.getUsername().equals(username)).findFirst().orElse(null);
+    }
 }

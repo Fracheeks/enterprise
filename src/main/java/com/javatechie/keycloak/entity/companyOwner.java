@@ -13,17 +13,14 @@ import lombok.NoArgsConstructor;
 @Data
 public class companyOwner extends user {
 
-    @Column(name = "name")
-    private String name;
-
     @Column(name = "company")
     private String company;
 
     @OneToMany(fetch = FetchType.EAGER,mappedBy = "CompanyOwner")
     private List<Employee> employeesOfTheCompany;
 
-    public companyOwner(String name, String company){
-        this.name = name;
+    public companyOwner(String username, String company){
+        super.username = username;
         this.company=company;
         super.roleName="companyOwner";
     }
