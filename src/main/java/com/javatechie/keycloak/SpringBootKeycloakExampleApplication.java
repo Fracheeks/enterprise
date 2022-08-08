@@ -120,9 +120,11 @@ public class SpringBootKeycloakExampleApplication {
             Employee emp = (Employee) service.getUser(employeeId);
 
             if (emp == null || !emp.getRoleName().equals("employee")) {
-                throw new ClassNotFoundException("employee not exists");}
+                throw new ClassNotFoundException("employee not exists");
+            }
 
-            //find the companyOwner
+            //find the company owner
+        
             companyOwner own = (companyOwner) service.getAllCompanyOwner().stream().
                     filter(e -> ((companyOwner) e).getCompany().equals(companyName)).findFirst().orElse(null);
 
