@@ -20,20 +20,20 @@ public class SpringBootKeycloakExampleApplication {
     @Autowired
     private userService service;
 
-    //GET REQUEST
+    //GET REQUEST ======================================================================================================
 
 
-    //get all users
+    //get ALL USERS
     @GetMapping
     @PreAuthorize("hasRole('admin')")
     public  ResponseEntity<List<user>> loadAllUsers () {
-        return ResponseEntity.ok(service.getAllEmployees());
+        return ResponseEntity.ok(service.getAllUsers());
     }
 
     @GetMapping("/{Id}")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<user> getEmployeebyEmployee(@PathVariable int Id) throws AccessDeniedException {
-       /* user principal = (user) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        user principal = (user) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         //companyOwner access
         if(principal instanceof companyOwner){
@@ -49,25 +49,33 @@ public class SpringBootKeycloakExampleApplication {
             else throw new AccessDeniedException("Access denied");
         }
 
-        //admin access*/
+        //admin access
         return ResponseEntity.ok(service.getUser(Id));}
 
-    //get all employees of a company
+
+    //get ALL EMPLOYEES
+    @GetMapping("/employees")
+    @PreAuthorize("hasRole('admin')")
+    public  ResponseEntity<List<user>> loadAllEmployees () {
+        return ResponseEntity.ok(service.getAllEmployees());
+    }
+
+    //get ALL EMPLOYEES of a COMPANY
     @GetMapping("/company/{companyName}")
     @PreAuthorize("hasRole('admin')")
-    public  ResponseEntity<List<user>> loadAllEmployees (@PathVariable String companyName) {
+    public  ResponseEntity<List<user>> loadAllEmployeesOfaCompany (@PathVariable String companyName) {
         return ResponseEntity.ok(service.getAllEmployees().stream().
                 filter(e->((Employee)e).getCompanyOwner().getCompany().equals(companyName)).toList());
     }
 
-    //get all companies
+    //get ALL COMPANIES
     @GetMapping("/company")
     @PreAuthorize("hasRole('admin')")
-    public  ResponseEntity<List<String>> loadAllEmployees () {
+    public  ResponseEntity<List<String>> loadAllCompanies() {
         return ResponseEntity.ok(service.getAllCompanyOwner().stream().map(e->((companyOwner)e).getCompany()).toList());
     }
 
-    //DELETE REQUEST
+    //DELETE REQUEST====================================================================================================
     @DeleteMapping("/{employeeId}")
     @PreAuthorize("hasRole('companyOwner')"+"|| hasRole('admin')")
     ResponseEntity<?> deleteEmployeeByCompanyOwner(@PathVariable int employeeId) {
@@ -80,7 +88,7 @@ public class SpringBootKeycloakExampleApplication {
 
         return ResponseEntity.noContent().build();}
 
-    //POST REQUEST
+    //POST REQUEST======================================================================================================
     @PostMapping
     @PreAuthorize("hasRole('companyOwner')" + "|| hasRole('admin')")
     user newEmployee(@RequestBody Employee newEmployee) {
@@ -99,4 +107,40 @@ public class SpringBootKeycloakExampleApplication {
         SpringApplication.run(SpringBootKeycloakExampleApplication.class, args);
     }
 
+    //PUT REQUEST======================================================================================================
+
+    //add an employee by the Admin
+    @PutMapping("/{companyName]/{employeeId}")
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity<user> putAnEmployeeIntoaCompanyByAdmin (@PathVariable String companyName, @PathVariable int employeeId) throws ClassNotFoundException {
+        if(service.getAllCompanyOwner().stream().anyMatch(e->((companyOwner)e).getCompany().equals(companyName))){
+           Employee emp = (Employee)service.getUser(employeeId);
+
+           if(emp==null){throw new ClassNotFoundException("employee not exists");}
+
+           companyOwner own = (companyOwner) service.getAllCompanyOwner().stream().
+                   filter(e->((companyOwner)e).getCompany().equals(companyName)).findFirst().get();
+
+           emp.setCompanyOwner(own);
+           own.addNewEmployee(emp);
+           return ResponseEntity.ok(emp);
+          }
+         throw new ClassNotFoundException("company not exists");}
+
+    //add an employee by the companyOwner
+    @PutMapping("/{companyName]/{employeeId}")
+    @PreAuthorize("hasRole('companyOwner')")
+    public ResponseEntity<user> putAnEmployeeIntoaCompanyByCompanyOwner (@PathVariable int employeeId) throws ClassNotFoundException {
+
+        companyOwner principal = (companyOwner) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Employee emp = (Employee) service.getUser(employeeId);
+
+        if (emp == null) {
+            throw new ClassNotFoundException("employee not exists");
+        }
+
+        emp.setCompanyOwner(principal);
+        principal.addNewEmployee(emp);
+        return ResponseEntity.ok(emp);
+    }
 }

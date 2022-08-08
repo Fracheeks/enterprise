@@ -39,6 +39,8 @@ public class userService {
         return getUser(id);
     }
 
-
+    public List<user> getAllUsers(){
+        return repo.findAll();
+    }
 
 }
