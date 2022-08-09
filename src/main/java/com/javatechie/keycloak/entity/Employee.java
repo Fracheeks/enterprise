@@ -20,7 +20,7 @@ public class Employee extends user {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "companyOwner_id")
     @JsonIgnore
-    private companyOwner CompanyOwner;
+    private companyOwner CompanyOwner=null;
 
     public Employee(String username, double salary) {
         super.username = username;
