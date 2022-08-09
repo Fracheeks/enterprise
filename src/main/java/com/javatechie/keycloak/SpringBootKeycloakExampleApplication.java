@@ -1,10 +1,12 @@
 package com.javatechie.keycloak;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javatechie.keycloak.entity.*;
 import com.javatechie.keycloak.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.*;
@@ -67,7 +69,7 @@ public class SpringBootKeycloakExampleApplication {
     @GetMapping("/company/{companyName}")
     @PreAuthorize("hasRole('admin')")
     public  ResponseEntity<List<user>> loadAllEmployeesOfaCompany (@PathVariable String companyName) {
-        return ResponseEntity.ok(service.getAllEmployees().stream().
+        return ResponseEntity.ok(service.getAllEmployees().stream().filter(e->((Employee)e).getCompanyOwner()!=null).
                 filter(e->((Employee)e).getCompanyOwner().getCompany().equals(companyName)).toList());
     }
 
@@ -132,9 +134,10 @@ public class SpringBootKeycloakExampleApplication {
                 throw new ClassNotFoundException("company not exists");
             }
 
-            emp.setCompanyOwner(own);
             own.addNewEmployee(emp);
-            return ResponseEntity.ok(emp);
+            emp.setCompanyOwner(own);
+
+            return ResponseEntity.ok(own);
 
         }
 

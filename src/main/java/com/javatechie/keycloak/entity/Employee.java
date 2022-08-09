@@ -1,5 +1,9 @@
 package com.javatechie.keycloak.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -7,6 +11,9 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "Employee_user")
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 @NoArgsConstructor
 @Data
 public class Employee extends user {
@@ -16,7 +23,7 @@ public class Employee extends user {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "companyOwner_id")
-    private companyOwner CompanyOwner=null;
+    private companyOwner CompanyOwner;
 
     public Employee(String username, double salary) {
         super.username = username;
@@ -29,9 +36,5 @@ public class Employee extends user {
         this.salary = salary;
         this.CompanyOwner=owner;
         super.roleName="employee";
-    }
-
-    public companyOwner getCompanyOwner() {
-        return CompanyOwner;
     }
 }
