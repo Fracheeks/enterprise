@@ -1,6 +1,5 @@
 package com.javatechie.keycloak.service;
 
-import com.javatechie.keycloak.entity.*;
 import com.javatechie.keycloak.repository.userRepository;
 import com.javatechie.keycloak.entity.user;
 import org.springframework.beans.factory.annotation.Autowired;

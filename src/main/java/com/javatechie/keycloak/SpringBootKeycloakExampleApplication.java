@@ -11,7 +11,6 @@ import org.springframework.security.access.prepost.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
 import java.security.Principal;
 import java.util.List;
 
@@ -23,7 +22,24 @@ public class SpringBootKeycloakExampleApplication {
     @Autowired
     private userService service;
 
-    //GET REQUEST ======================================================================================================
+    public static void main(String[] args) {
+        SpringApplication.run(SpringBootKeycloakExampleApplication.class, args);
+    }
+
+    private String getCurrentUsername() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            return ((UserDetails) principal).getUsername();
+        }
+        if (principal instanceof Principal) {
+            return ((Principal) principal).getName();
+        }
+        return String.valueOf(principal);
+    }
+
+    /*==================================================================================================================
+    GET REQUEST
+    ==================================================================================================================*/
 
 
     //get ALL USERS
@@ -78,7 +94,12 @@ public class SpringBootKeycloakExampleApplication {
         return ResponseEntity.ok(service.getAllCompanyOwner().stream().map(e->((companyOwner)e).getCompany()).toList());
     }
 
-    //DELETE REQUEST====================================================================================================
+
+    /*==================================================================================================================
+    DELETE REQUEST
+    ==================================================================================================================*/
+
+    //delete an employee
     @DeleteMapping("/{employeeId}")
     @PreAuthorize("hasRole('companyOwner')"+"|| hasRole('admin')")
     ResponseEntity<?> deleteEmployeeByCompanyOwner(@PathVariable int employeeId) {
@@ -91,7 +112,7 @@ public class SpringBootKeycloakExampleApplication {
 
         return ResponseEntity.noContent().build();}
 
-    //delete an employee from a company
+    //remove an employee from a company by the admin
     @DeleteMapping("remove/{companyName}/{employeeId}")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<user> deleteAnEmployeeFromACompany (@PathVariable String companyName, @PathVariable int employeeId) throws ClassNotFoundException {
@@ -118,6 +139,7 @@ public class SpringBootKeycloakExampleApplication {
 
         return ResponseEntity.noContent().build();}
 
+    //remove an employee from a company by the companyOwner
     @DeleteMapping("remove/{employeeId}")
     @PreAuthorize("hasRole('companyOwner')")
     public ResponseEntity<user> deleteAnEmployeeFromACompanyByCompanyOwner (@PathVariable int employeeId) throws ClassNotFoundException {
@@ -139,7 +161,10 @@ public class SpringBootKeycloakExampleApplication {
     }
 
 
-    //POST REQUEST======================================================================================================
+    /*==================================================================================================================
+    POST REQUEST
+    ==================================================================================================================*/
+
     @PostMapping
     @PreAuthorize("hasRole('companyOwner')" + "|| hasRole('admin')")
     user newEmployee(@RequestBody Employee newEmployee) {
@@ -154,11 +179,10 @@ public class SpringBootKeycloakExampleApplication {
         return service.addUser(newEmployee);
     }
 
-    public static void main(String[] args) {
-        SpringApplication.run(SpringBootKeycloakExampleApplication.class, args);
-    }
 
-    //PUT REQUEST======================================================================================================
+    /*==================================================================================================================
+    PUT REQUEST
+    ==================================================================================================================*/
 
     //add an employee by the Admin
     @PutMapping("/add/{companyName}/{employeeId}")
@@ -210,16 +234,5 @@ public class SpringBootKeycloakExampleApplication {
         emp.setCompanyOwner((companyOwner) User); ((companyOwner)User).addNewEmployee(emp);
         service.addUser(emp);service.addUser(User);
         return ResponseEntity.ok(emp);
-    }
-
-    private String getCurrentUsername() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails) {
-            return ((UserDetails) principal).getUsername();
-        }
-        if (principal instanceof Principal) {
-            return ((Principal) principal).getName();
-        }
-        return String.valueOf(principal);
     }
 }
