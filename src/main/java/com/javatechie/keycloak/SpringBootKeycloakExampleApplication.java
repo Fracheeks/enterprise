@@ -91,6 +91,54 @@ public class SpringBootKeycloakExampleApplication {
 
         return ResponseEntity.noContent().build();}
 
+    //delete an enployee from a company
+    @DeleteMapping("remove/{companyName}/{employeeId}")
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity<user> deleteAnEmployeeFromACompany (@PathVariable String companyName, @PathVariable int employeeId) throws ClassNotFoundException {
+        //find the user
+        user emp = service.getUser(employeeId);
+
+        if (emp == null || !emp.getRoleName().equals("employee")) {
+            throw new ClassNotFoundException("employee not exists");
+        }
+
+        if (((Employee)emp).getCompanyOwner()==null) {
+            throw new ClassNotFoundException("employee not assigned");
+        }
+
+        companyOwner own = (companyOwner) service.getAllCompanyOwner().stream().
+                filter(e -> ((companyOwner) e).getCompany().equals(companyName)).findFirst().orElse(null);
+
+        if (own == null) {
+            throw new ClassNotFoundException("company not exists");
+        }
+
+        own.deleteAnEmployee((Employee) emp); ((Employee) emp).setCompanyOwner(null);
+        service.addUser(emp);service.addUser(own);
+
+        return ResponseEntity.noContent().build();}
+
+    @DeleteMapping("remove/{employeeId}")
+    @PreAuthorize("hasRole('companyOwner')")
+    public ResponseEntity<user> deleteAnEmployeeFromACompanyByCompanyOwner (@PathVariable int employeeId) throws ClassNotFoundException {
+
+        user User = service.getUserByUsername(getCurrentUsername());
+        Employee emp = (Employee) service.getUser(employeeId);
+
+        if (emp == null) {
+            throw new ClassNotFoundException("employee not exists");
+        }
+
+        if (emp.getCompanyOwner()!=null) {
+            throw new ClassNotFoundException("employee already assigned");
+        }
+
+        emp.setCompanyOwner(null);  ((companyOwner)User).deleteAnEmployee(emp);
+        service.addUser(emp);service.addUser(User);
+        return ResponseEntity.ok(emp);
+    }
+
+
     //POST REQUEST======================================================================================================
     @PostMapping
     @PreAuthorize("hasRole('companyOwner')" + "|| hasRole('admin')")
@@ -113,7 +161,7 @@ public class SpringBootKeycloakExampleApplication {
     //PUT REQUEST======================================================================================================
 
     //add an employee by the Admin
-    @PutMapping("/{companyName}/{employeeId}")
+    @PutMapping("/add/{companyName}/{employeeId}")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<user> putAnEmployeeIntoACompany (@PathVariable String companyName, @PathVariable int employeeId) throws ClassNotFoundException {
             //find the user
@@ -144,11 +192,11 @@ public class SpringBootKeycloakExampleApplication {
         }
 
     //add an employee by the companyOwner
-    @PutMapping("/{employeeId}")
+    @PutMapping("/add//{employeeId}")
     @PreAuthorize("hasRole('companyOwner')")
     public ResponseEntity<user> putAnEmployeeIntoACompanyByCompanyOwner (@PathVariable int employeeId) throws ClassNotFoundException {
 
-        companyOwner principal = (companyOwner) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        user User = service.getUserByUsername(getCurrentUsername());
         Employee emp = (Employee) service.getUser(employeeId);
 
         if (emp == null) {
@@ -159,8 +207,8 @@ public class SpringBootKeycloakExampleApplication {
             throw new ClassNotFoundException("employee already assigned");
         }
 
-        emp.setCompanyOwner(principal);
-        principal.addNewEmployee(emp);
+        emp.setCompanyOwner((companyOwner) User); ((companyOwner)User).addNewEmployee(emp);
+        service.addUser(emp);service.addUser(User);
         return ResponseEntity.ok(emp);
     }
 

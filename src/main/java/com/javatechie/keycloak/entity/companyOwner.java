@@ -34,4 +34,8 @@ public class companyOwner extends user {
     public void addNewEmployee(Employee newEmployee){
         employeesOfTheCompany.add(newEmployee);
     }
+
+    public void deleteAnEmployee(Employee employee){
+        this.employeesOfTheCompany.remove(employee);
+    }
 }
