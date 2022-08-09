@@ -30,8 +30,8 @@ public class userService {
     public List<user> getAllEmployees() {
         return repo.findAll().stream().filter(e->e.roleName.equals("employee")).toList();
     }
-    public user addEmployee(Employee newEmployee){
-        int id = repo.save(newEmployee).getId();
+    public user addUser(user newUser){
+        int id = repo.save(newUser).getId();
         return getUser(id);
     }
 
