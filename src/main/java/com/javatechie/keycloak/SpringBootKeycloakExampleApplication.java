@@ -91,7 +91,7 @@ public class SpringBootKeycloakExampleApplication {
 
         return ResponseEntity.noContent().build();}
 
-    //delete an enployee from a company
+    //delete an employee from a company
     @DeleteMapping("remove/{companyName}/{employeeId}")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<user> deleteAnEmployeeFromACompany (@PathVariable String companyName, @PathVariable int employeeId) throws ClassNotFoundException {
