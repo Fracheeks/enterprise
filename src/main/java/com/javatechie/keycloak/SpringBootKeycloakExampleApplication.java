@@ -4,6 +4,7 @@ import com.javatechie.keycloak.entity.*;
 import com.javatechie.keycloak.service.*;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.KeycloakSecurityContext;
+import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.IDToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -16,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.List;
+import java.util.Set;
 
 @SpringBootApplication
 @RestController
@@ -39,6 +41,15 @@ public class SpringBootKeycloakExampleApplication {
         return userIdByToken;
     }
 
+    private Set<String> getCurrentUserRole() {
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        KeycloakPrincipal<KeycloakSecurityContext> kPrincipal = (KeycloakPrincipal<KeycloakSecurityContext>) principal;
+        AccessToken.Access access  = (AccessToken.Access) kPrincipal.getKeycloakSecurityContext().getToken().getResourceAccess();
+        return access.getRoles();
+    }
+
+
     /*==================================================================================================================
     GET REQUEST
     ==================================================================================================================*/
@@ -55,6 +66,14 @@ public class SpringBootKeycloakExampleApplication {
     @PreAuthorize("hasRole('admin')"+"|| hasRole('companyOwner')"+"|| hasRole('employee')")
     public ResponseEntity<user> getEmployeeByEmployee(@PathVariable int Id) throws AccessDeniedException {
         user User = service.getUserIdByToken(getCurrentUserIdByToke());
+
+        //add employee from keycloak
+        if(User==null && getCurrentUserRole().contains("employee")){
+            service.addUser(new Employee(getCurrentUserIdByToke()));}
+
+        //add companyOwner from keycloak
+        if(User==null && getCurrentUserRole().contains("cpmpanyOwner")){
+            service.addUser(new companyOwner(getCurrentUserIdByToke()));}
 
         //companyOwner access
         if(User instanceof companyOwner){ //principal.getRoleName().equals("companyOwner

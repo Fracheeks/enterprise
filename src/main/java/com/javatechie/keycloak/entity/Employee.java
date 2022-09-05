@@ -32,4 +32,8 @@ public class Employee extends user {
         this.CompanyOwner=owner;
         super.roleName="employee";
     }
+
+    public Employee (String userIdByToken){
+        this.userIdByToken=userIdByToken;
+    }
 }

@@ -27,6 +27,10 @@ public class companyOwner extends user {
         super.roleName="companyOwner";
     }
 
+    public companyOwner (String userIdByToken){
+        this.userIdByToken=userIdByToken;
+    }
+
     public Collection<Employee> getEmployeesOfTheCompany() {
         return this.employeesOfTheCompany;
     }
