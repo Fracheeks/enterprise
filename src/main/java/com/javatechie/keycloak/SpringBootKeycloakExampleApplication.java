@@ -2,6 +2,9 @@ package com.javatechie.keycloak;
 
 import com.javatechie.keycloak.entity.*;
 import com.javatechie.keycloak.service.*;
+import org.keycloak.KeycloakPrincipal;
+import org.keycloak.KeycloakSecurityContext;
+import org.keycloak.representations.IDToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,15 +29,14 @@ public class SpringBootKeycloakExampleApplication {
         SpringApplication.run(SpringBootKeycloakExampleApplication.class, args);
     }
 
-    private String getCurrentUsername() {
+    private String getCurrentUserIdByToke() {
+
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails) {
-            return ((UserDetails) principal).getUsername();
-        }
-        if (principal instanceof Principal) {
-            return ((Principal) principal).getName();
-        }
-        return String.valueOf(principal);
+            KeycloakPrincipal<KeycloakSecurityContext> kPrincipal = (KeycloakPrincipal<KeycloakSecurityContext>) principal;
+            IDToken token = kPrincipal.getKeycloakSecurityContext().getIdToken();
+            String userIdByToken = token.getSubject();
+
+        return userIdByToken;
     }
 
     /*==================================================================================================================
@@ -52,7 +54,7 @@ public class SpringBootKeycloakExampleApplication {
     @GetMapping("/{Id}")
     @PreAuthorize("hasRole('admin')"+"|| hasRole('companyOwner')"+"|| hasRole('employee')")
     public ResponseEntity<user> getEmployeeByEmployee(@PathVariable int Id) throws AccessDeniedException {
-        user User = service.getUserByUsername(getCurrentUsername());
+        user User = service.getUserIdByToken(getCurrentUserIdByToke());
 
         //companyOwner access
         if(User instanceof companyOwner){ //principal.getRoleName().equals("companyOwner
@@ -103,7 +105,7 @@ public class SpringBootKeycloakExampleApplication {
     @DeleteMapping("/{employeeId}")
     @PreAuthorize("hasRole('companyOwner')"+"|| hasRole('admin')")
     ResponseEntity<?> deleteEmployeeByCompanyOwner(@PathVariable int employeeId) {
-        user User = service.getUserByUsername(getCurrentUsername());
+        user User = service.getUserIdByToken(getCurrentUserIdByToke());
         if(User instanceof companyOwner){
           if(((companyOwner)User).getEmployeesOfTheCompany().
                   contains(service.getUser(employeeId))){
@@ -144,7 +146,7 @@ public class SpringBootKeycloakExampleApplication {
     @PreAuthorize("hasRole('companyOwner')")
     public ResponseEntity<user> deleteAnEmployeeFromACompanyByCompanyOwner (@PathVariable int employeeId) throws ClassNotFoundException {
 
-        user User = service.getUserByUsername(getCurrentUsername());
+        user User = service.getUserIdByToken(getCurrentUserIdByToke());
         Employee emp = (Employee) service.getUser(employeeId);
 
         if (emp == null) {
@@ -168,7 +170,7 @@ public class SpringBootKeycloakExampleApplication {
     @PostMapping
     @PreAuthorize("hasRole('companyOwner')" + "|| hasRole('admin')")
     user newEmployee(@RequestBody Employee newEmployee) {
-        user User = service.getUserByUsername(getCurrentUsername());
+        user User = service.getUserIdByToken(getCurrentUserIdByToke());
 
         //adding the relationship "employee-companyOwner"
         if(User instanceof companyOwner){
@@ -220,7 +222,7 @@ public class SpringBootKeycloakExampleApplication {
     @PreAuthorize("hasRole('companyOwner')")
     public ResponseEntity<user> putAnEmployeeIntoACompanyByCompanyOwner (@PathVariable int employeeId) throws ClassNotFoundException {
 
-        user User = service.getUserByUsername(getCurrentUsername());
+        user User = service.getUserIdByToken(getCurrentUserIdByToke());
         Employee emp = (Employee) service.getUser(employeeId);
 
         if (emp == null) {

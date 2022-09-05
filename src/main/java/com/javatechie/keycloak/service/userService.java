@@ -38,7 +38,7 @@ public class userService {
         return repo.findAll();
     }
 
-    public user getUserByUsername(String username) {
-        return getAllEmployees().stream().filter(e->e.getUsername().equals(username)).findFirst().orElse(null);
+    public user getUserIdByToken(String username) {
+        return getAllEmployees().stream().filter(e->e.getUserIdByToken().equals(username)).findFirst().orElse(null);
     }
 }

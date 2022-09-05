@@ -18,4 +18,7 @@ public abstract class user {
 
     @Column(name = "username")
     public String username;
+
+    @Column(name = "userIdByToke")
+    public String userIdByToken; //referenced to keycloak
 }
