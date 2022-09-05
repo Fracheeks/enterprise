@@ -10,7 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "companyOwner_user")
+@Table(name = "companyOwner")
 @NoArgsConstructor
 @Data
 public class companyOwner extends user {
