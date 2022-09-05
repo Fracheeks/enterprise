@@ -13,9 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.*;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import java.security.Principal;
 import java.util.List;
 import java.util.Set;
 
@@ -35,10 +33,7 @@ public class SpringBootKeycloakExampleApplication {
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             KeycloakPrincipal<KeycloakSecurityContext> kPrincipal = (KeycloakPrincipal<KeycloakSecurityContext>) principal;
-            IDToken token = kPrincipal.getKeycloakSecurityContext().getIdToken();
-            String userIdByToken = token.getSubject();
-
-        return userIdByToken;
+            return kPrincipal.getKeycloakSecurityContext().getIdToken().getSubject();
     }
 
     private Set<String> getCurrentUserRole() {
@@ -72,7 +67,7 @@ public class SpringBootKeycloakExampleApplication {
             service.addUser(new Employee(getCurrentUserIdByToke()));}
 
         //add companyOwner from keycloak
-        if(User==null && getCurrentUserRole().contains("cpmpanyOwner")){
+        if(User==null && getCurrentUserRole().contains("companyOwner")){
             service.addUser(new companyOwner(getCurrentUserIdByToke()));}
 
         //companyOwner access
