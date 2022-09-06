@@ -1,4 +1,5 @@
 package com.javatechie.keycloak.entity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -20,6 +21,7 @@ public abstract class user {
     public String username;
 
     @Column(name = "userIdByToke")
+    @JsonIgnore
     public String userIdByToken; //referenced to keycloak
 
 }
