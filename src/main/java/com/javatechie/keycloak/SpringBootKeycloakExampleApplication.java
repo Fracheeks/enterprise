@@ -43,6 +43,21 @@ public class SpringBootKeycloakExampleApplication {
         return access.getRoles();
     }
 
+    user findUser() {
+        user User = service.getUserIdByToken(getCurrentUserIdByToke());
+
+        //add employee from keycloak
+        if (User == null && getCurrentUserRole().contains("employee")) {
+            service.addUser(new Employee(getCurrentUserIdByToke()));
+        }
+
+        //add companyOwner from keycloak
+        if (User == null && getCurrentUserRole().contains("companyOwner")) {
+            service.addUser(new companyOwner(getCurrentUserIdByToke()));
+        }
+
+        return User;
+    }
 
     /*==================================================================================================================
     GET REQUEST
@@ -59,15 +74,8 @@ public class SpringBootKeycloakExampleApplication {
     @GetMapping("/{Id}")
     @PreAuthorize("hasRole('admin')"+"|| hasRole('companyOwner')"+"|| hasRole('employee')")
     public ResponseEntity<user> getEmployeeByEmployee(@PathVariable int Id) throws AccessDeniedException {
-        user User = service.getUserIdByToken(getCurrentUserIdByToke());
 
-        //add employee from keycloak
-        if(User==null && getCurrentUserRole().contains("employee")){
-            service.addUser(new Employee(getCurrentUserIdByToke()));}
-
-        //add companyOwner from keycloak
-        if(User==null && getCurrentUserRole().contains("companyOwner")){
-            service.addUser(new companyOwner(getCurrentUserIdByToke()));}
+        user User = findUser();
 
         //companyOwner access
         if(User instanceof companyOwner){ //principal.getRoleName().equals("companyOwner
@@ -118,7 +126,7 @@ public class SpringBootKeycloakExampleApplication {
     @DeleteMapping("/{employeeId}")
     @PreAuthorize("hasRole('companyOwner')"+"|| hasRole('admin')")
     ResponseEntity<?> deleteEmployeeByCompanyOwner(@PathVariable int employeeId) {
-        user User = service.getUserIdByToken(getCurrentUserIdByToke());
+        user User = findUser();
         if(User instanceof companyOwner){
           if(((companyOwner)User).getEmployeesOfTheCompany().
                   contains(service.getUser(employeeId))){
@@ -159,7 +167,7 @@ public class SpringBootKeycloakExampleApplication {
     @PreAuthorize("hasRole('companyOwner')")
     public ResponseEntity<user> deleteAnEmployeeFromACompanyByCompanyOwner (@PathVariable int employeeId) throws ClassNotFoundException {
 
-        user User = service.getUserIdByToken(getCurrentUserIdByToke());
+        user User = findUser();
         Employee emp = (Employee) service.getUser(employeeId);
 
         if (emp == null) {
@@ -183,7 +191,7 @@ public class SpringBootKeycloakExampleApplication {
     @PostMapping
     @PreAuthorize("hasRole('companyOwner')" + "|| hasRole('admin')")
     user newEmployee(@RequestBody Employee newEmployee) {
-        user User = service.getUserIdByToken(getCurrentUserIdByToke());
+        user User = findUser();
 
         //adding the relationship "employee-companyOwner"
         if(User instanceof companyOwner){
@@ -235,7 +243,7 @@ public class SpringBootKeycloakExampleApplication {
     @PreAuthorize("hasRole('companyOwner')")
     public ResponseEntity<user> putAnEmployeeIntoACompanyByCompanyOwner (@PathVariable int employeeId) throws ClassNotFoundException {
 
-        user User = service.getUserIdByToken(getCurrentUserIdByToke());
+        user User = findUser();
         Employee emp = (Employee) service.getUser(employeeId);
 
         if (emp == null) {
