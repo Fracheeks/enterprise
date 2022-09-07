@@ -197,7 +197,7 @@ public class SpringBootKeycloakExampleApplication {
 
         if (emp.getCompanyOwner()!=null) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, ("employee already assigned"));
+                    HttpStatus.NOT_MODIFIED, ("employee already assigned"));
         }
 
         emp.setCompanyOwner(null);  ((companyOwner)User).deleteAnEmployee(emp);
