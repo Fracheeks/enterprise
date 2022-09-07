@@ -1,8 +1,7 @@
 package com.javatechie.keycloak.entity;
 
 import javax.persistence.*;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,7 +15,7 @@ public class companyOwner extends user {
     private String company;
 
     @OneToMany(fetch = FetchType.EAGER,mappedBy = "CompanyOwner")
-    private List<Employee> employeesOfTheCompany;
+    private List<Employee> employeesOfTheCompany = new ArrayList<>();
 
     public companyOwner(String username, String company){
         super.username = username;
