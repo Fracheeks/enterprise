@@ -2,19 +2,20 @@ package com.javatechie.keycloak;
 
 import com.javatechie.keycloak.entity.*;
 import com.javatechie.keycloak.service.*;
-import org.keycloak.KeycloakPrincipal;
-import org.keycloak.KeycloakSecurityContext;
-import org.keycloak.representations.AccessToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import java.security.Principal;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @SpringBootApplication
 @RestController
@@ -31,28 +32,33 @@ public class SpringBootKeycloakExampleApplication {
     private String getCurrentUserIdByToke() {
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            KeycloakPrincipal<KeycloakSecurityContext> kPrincipal = (KeycloakPrincipal<KeycloakSecurityContext>) principal;
-            return kPrincipal.getKeycloakSecurityContext().getIdToken().getSubject();
+        if (principal instanceof UserDetails) {
+            return ((UserDetails) principal).getUsername();
+        }
+        if (principal instanceof Principal) {
+            return ((Principal) principal).getName();
+        }
+        return String.valueOf(principal);
+
     }
 
     private Set<String> getCurrentUserRole() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        KeycloakPrincipal<KeycloakSecurityContext> kPrincipal = (KeycloakPrincipal<KeycloakSecurityContext>) principal;
-        AccessToken.Access access  = (AccessToken.Access) kPrincipal.getKeycloakSecurityContext().getToken().getResourceAccess();
-        return access.getRoles();
+        return  authentication.getAuthorities().stream()
+                .map(r -> r.getAuthority()).collect(Collectors.toSet());
     }
 
     user findUser() {
         user User = service.getUserIdByToken(getCurrentUserIdByToke());
 
         //add employee from keycloak
-        if (User == null && getCurrentUserRole().contains("employee")) {
+        if (User == null && getCurrentUserRole().contains("ROLE_employee")) {
             service.addUser(new Employee(getCurrentUserIdByToke()));
         }
 
         //add companyOwner from keycloak
-        if (User == null && getCurrentUserRole().contains("companyOwner")) {
+        if (User == null && getCurrentUserRole().contains("ROLE_companyOwner")) {
             service.addUser(new companyOwner(getCurrentUserIdByToke()));
         }
 
@@ -99,14 +105,14 @@ public class SpringBootKeycloakExampleApplication {
     @GetMapping("/employees")
     @PreAuthorize("hasRole('admin')")
     public  ResponseEntity<List<user>> loadAllEmployees () {
-        return ResponseEntity.ok(service.getAllEmployees());
+        return ResponseEntity.ok(service.getATypeOfUsers("employee"));
     }
 
     //get ALL EMPLOYEES of a COMPANY
     @GetMapping("/company/{companyName}")
     @PreAuthorize("hasRole('admin')")
     public  ResponseEntity<List<user>> loadAllEmployeesOfaCompany (@PathVariable String companyName) {
-        return ResponseEntity.ok(service.getAllEmployees().stream().filter(e->((Employee)e).getCompanyOwner()!=null).
+        return ResponseEntity.ok(service.getATypeOfUsers("employee").stream().filter(e->((Employee)e).getCompanyOwner()!=null).
                 filter(e->((Employee)e).getCompanyOwner().getCompany().equals(companyName)).toList());
     }
 
@@ -114,7 +120,7 @@ public class SpringBootKeycloakExampleApplication {
     @GetMapping("/company")
     @PreAuthorize("hasRole('admin')")
     public  ResponseEntity<List<String>> loadAllCompanies() {
-        return ResponseEntity.ok(service.getAllCompanyOwner().stream().map(e->((companyOwner)e).getCompany()).toList());
+        return ResponseEntity.ok(service.getATypeOfUsers("companyOwner").stream().map(e->((companyOwner)e).getCompany()).toList());
     }
 
 
@@ -150,7 +156,7 @@ public class SpringBootKeycloakExampleApplication {
             throw new ClassNotFoundException("employee not assigned");
         }
 
-        companyOwner own = (companyOwner) service.getAllCompanyOwner().stream().
+        companyOwner own = (companyOwner) service.getATypeOfUsers("companyOwner").stream().
                 filter(e -> ((companyOwner) e).getCompany().equals(companyName)).findFirst().orElse(null);
 
         if (own == null) {
@@ -224,7 +230,7 @@ public class SpringBootKeycloakExampleApplication {
 
         //find the company owner
         
-            companyOwner own = (companyOwner) service.getAllCompanyOwner().stream().
+            companyOwner own = (companyOwner) service.getATypeOfUsers("companyOwner").stream().
                     filter(e -> ((companyOwner) e).getCompany().equals(companyName)).findFirst().orElse(null);
 
             if (own == null) {

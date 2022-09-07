@@ -12,10 +12,6 @@ public class userService {
     @Autowired
     private userRepository repo;
 
-    public List<user> getAllCompanyOwner() {
-        return repo.findAll().stream().filter(e->e.roleName.equals("companyOwner")).toList();
-    }
-
     public user getUser(int id) {
         return repo
                 .findById(id)
@@ -26,8 +22,8 @@ public class userService {
         repo.deleteById(Id);
     }
 
-    public List<user> getAllEmployees() {
-        return repo.findAll().stream().filter(e->e.roleName.equals("employee")).toList();
+    public List<user> getATypeOfUsers(String type) {
+        return repo.findAll().stream().filter(e->type.equals(e.getRoleName())).toList();
     }
     public user addUser(user newUser){
         int id = repo.save(newUser).getId();
@@ -38,7 +34,7 @@ public class userService {
         return repo.findAll();
     }
 
-    public user getUserIdByToken(String username) {
-        return getAllEmployees().stream().filter(e->e.getUserIdByToken().equals(username)).findFirst().orElse(null);
+    public user getUserIdByToken(String IdToken) {
+        return getAllUsers().stream().filter(e->IdToken.equals(e.getUserIdByToken())).findFirst().orElse(null);
     }
 }
