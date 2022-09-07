@@ -2,6 +2,9 @@ package com.javatechie.keycloak;
 
 import com.javatechie.keycloak.entity.*;
 import com.javatechie.keycloak.service.*;
+import org.keycloak.KeycloakPrincipal;
+import org.keycloak.KeycloakSecurityContext;
+import org.keycloak.representations.AccessToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -35,10 +38,8 @@ public class SpringBootKeycloakExampleApplication {
         if (principal instanceof UserDetails) {
             return ((UserDetails) principal).getUsername();
         }
-        if (principal instanceof Principal) {
+        // else (principal instanceof Principal) {
             return ((Principal) principal).getName();
-        }
-        return String.valueOf(principal);
 
     }
 
@@ -49,17 +50,24 @@ public class SpringBootKeycloakExampleApplication {
                 .map(r -> r.getAuthority()).collect(Collectors.toSet());
     }
 
+    private String getCurrentUsername() {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        KeycloakPrincipal principal = (KeycloakPrincipal)auth.getPrincipal();
+        return  principal.getKeycloakSecurityContext().getToken().getPreferredUsername();
+    }
+
     user findUser() {
         user User = service.getUserIdByToken(getCurrentUserIdByToke());
 
         //add employee from keycloak
         if (User == null && getCurrentUserRole().contains("ROLE_employee")) {
-            service.addUser(new Employee(getCurrentUserIdByToke()));
+            User = service.addUser(new Employee(getCurrentUsername(), getCurrentUserIdByToke()));
         }
 
         //add companyOwner from keycloak
         if (User == null && getCurrentUserRole().contains("ROLE_companyOwner")) {
-            service.addUser(new companyOwner(getCurrentUserIdByToke()));
+            User = service.addUser(new companyOwner(getCurrentUsername(), null, getCurrentUserIdByToke()));
         }
 
         return User;
@@ -84,7 +92,7 @@ public class SpringBootKeycloakExampleApplication {
         user User = findUser();
 
         //companyOwner access
-        if(User instanceof companyOwner){ //principal.getRoleName().equals("companyOwner
+        if(User instanceof companyOwner){
             if(((companyOwner)User).getEmployeesOfTheCompany().
                     contains(service.getUser(Id)) || User.getId() == Id){
                           return ResponseEntity.ok(service.getUser(Id));}

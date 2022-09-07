@@ -33,7 +33,8 @@ public class Employee extends user {
         super.roleName="employee";
     }
 
-    public Employee (String userIdByToken){
+    public Employee (String username, String userIdByToken){
+        super.username=username;
         this.userIdByToken=userIdByToken;
         super.roleName="employee";
     }
