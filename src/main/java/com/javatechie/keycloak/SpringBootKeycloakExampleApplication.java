@@ -35,6 +35,10 @@ public class SpringBootKeycloakExampleApplication {
         SpringApplication.run(SpringBootKeycloakExampleApplication.class, args);
     }
 
+    /*==================================================================================================================
+    CONNECT TO KEYCLOAK DATABASE
+    ==================================================================================================================*/
+
     private String getCurrentUserIdByToke() {
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -60,7 +64,7 @@ public class SpringBootKeycloakExampleApplication {
         return  principal.getKeycloakSecurityContext().getToken().getPreferredUsername();
     }
 
-    user findUser() {
+    private user findUser() {
         user User = service.getUserIdByToken(getCurrentUserIdByToke());
 
         //add employee from keycloak
