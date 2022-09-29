@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @SpringBootApplication
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/users")
 public class SpringBootKeycloakExampleApplication {
@@ -74,7 +75,7 @@ public class SpringBootKeycloakExampleApplication {
 
         //add companyOwner from keycloak
         if (User == null && getCurrentUserRole().contains("ROLE_companyOwner")) {
-            User = service.addUser(new companyOwner(getCurrentUsername(), null, getCurrentUserIdByToke()));
+            User = service.addUser(new companyOwner(getCurrentUsername(), null, getCurrentUserIdByToke(), 0));
         }
 
         return User;

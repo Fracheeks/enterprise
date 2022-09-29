@@ -26,4 +26,8 @@ public abstract class user {
     @JsonIgnore
     public String userIdByToken; //referenced to keycloak
 
+    @Column(name = "salary")
+    public double salary;
+
+
 }

@@ -17,15 +17,17 @@ public class companyOwner extends user {
     @OneToMany(fetch = FetchType.EAGER,mappedBy = "CompanyOwner")
     private List<Employee> employeesOfTheCompany = new ArrayList<>();
 
-    public companyOwner(String username, String company){
+    public companyOwner(String username, String company, double salary){
         super.username = username;
+        super.salary = salary;
         this.company=company;
         super.roleName="companyOwner";
     }
 
-    public companyOwner (String username, String company, String userIdByToken){
+    public companyOwner (String username, String company, String userIdByToken, double salary){
         super.username=username;
         this.company=company;
+        super.salary = salary;
         this.userIdByToken=userIdByToken;
         super.roleName="companyOwner";
     }

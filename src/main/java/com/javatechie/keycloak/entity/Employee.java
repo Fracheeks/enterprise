@@ -12,9 +12,6 @@ import javax.persistence.*;
 @Data
 public class Employee extends user {
 
-    @Column(name = "salary")
-    private double salary;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "companyOwner_id")
     @JsonIgnore
@@ -22,7 +19,7 @@ public class Employee extends user {
 
     public Employee(String username, double salary) {
         super.username = username;
-        this.salary = salary;
+        super.salary = salary;
         super.roleName="employee";
     }
 

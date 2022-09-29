@@ -19,8 +19,8 @@ class LoadDatabase {
             repo.save(new Employee("john", 20000));
             repo.save(new Employee("mak", 55000));
             repo.save(new Employee("liam", 2222222));
-            repo.save(new companyOwner("fred","bancasella"));
-            repo.save(new companyOwner("jack", "ferrari"));
+            repo.save(new companyOwner("fred","bancasella", 5000));
+            repo.save(new companyOwner("jack", "ferrari", 2345));
             repo.findAll().forEach(user -> log.info("Preloaded" + user));
         };
     };
