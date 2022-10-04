@@ -270,7 +270,7 @@ public class SpringBootKeycloakExampleApplication {
         }
 
     //add an employee by the companyOwner
-    @PutMapping("/add//{employeeId}")
+    @PutMapping("/add/{employeeId}")
     @PreAuthorize("hasRole('companyOwner')")
     public ResponseEntity<user> putAnEmployeeIntoACompanyByCompanyOwner (@PathVariable int employeeId) throws ResponseStatusException {
 
